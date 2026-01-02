@@ -146,7 +146,20 @@ struct Remap * find_remap_for_virt_code(int virt_code)
 void send_key_def_input(char * input_name, KEY_DEF * key_def, enum Direction dir)
 {
     log_send_input(input_name, key_def, dir);
+
+    int is_shifted = key_def && (key_def->flags & 1);
+
+    if (is_shifted && dir == DOWN) {
+        // Send Left Shift DOWN (Scan: 0x2A, Virt: 0xA0)
+        send_input(0x002A, 0xA0, DOWN);
+    }
+
     send_input(key_def->scan_code, key_def->virt_code, dir);
+
+    if (is_shifted && dir == UP) {
+        // Send Left Shift UP
+        send_input(0x002A, 0xA0, UP);
+    }
 }
 
 /* @return block_input */

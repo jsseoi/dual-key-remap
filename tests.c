@@ -313,6 +313,27 @@ int main(void)
     EXPECT(strstr(log1, "<MOUSE INPUT>")         != NULL, "mouse input friendly name");
     EXPECT(strstr(log1, "NOOP")           != NULL, "noop code friendly name");
     free(log1);
+    
+    g_debug = 0;
+    clear_out();
+
+    SECTION("Shifted key output (LBRACE)");
+    reset_config();
+    KEY_DEF * lbrace_def = find_key_def_by_name("LBRACE");
+    KEY_DEF * caps_def = find_key_def_by_name("CAPSLOCK");
+    KEY_DEF * lbracket_def = find_key_def_by_name("LBRACKET");
+
+    struct Remap * r_shifted = new_remap(caps_def, lbrace_def, lbrace_def);
+    register_remap(r_shifted);
+
+    IN(CAPS, DOWN); EMPTY();
+    IN(CAPS, UP);
+    // Should see: Shift Down, LBracket Down, LBracket Up, Shift Up
+    SEE(LSHIFT, DOWN);
+    SEE(lbracket_def, DOWN);
+    SEE(lbracket_def, UP);
+    SEE(LSHIFT, UP);
+    EMPTY();
 
     g_debug = 0;
 
