@@ -156,6 +156,19 @@ struct Remap * find_remap_for_virt_code(int virt_code)
     return 0;
 }
 
+static void send_key_input(KEY_DEF *key, enum Direction dir)
+{
+    int is_shifted = key->flags & 1;
+
+    if (is_shifted && dir == DOWN)
+        send_input(0x002A, 0xA0, DOWN);
+
+    send_input(key->scan_code, key->virt_code, dir);
+
+    if (is_shifted && dir == UP)
+        send_input(0x002A, 0xA0, UP);
+}
+
 static void send_chord(const char *name, KEY_DEF **keys, int count, enum Direction dir)
 {
     if (count <= 0) return;
@@ -172,10 +185,10 @@ static void send_chord(const char *name, KEY_DEF **keys, int count, enum Directi
 
     if (dir == DOWN) {
         for (int i = 0; i < count; ++i)
-            send_input(keys[i]->scan_code, keys[i]->virt_code, DOWN);
+            send_key_input(keys[i], DOWN);
     } else {
         for (int i = count - 1; i >= 0; --i)
-            send_input(keys[i]->scan_code, keys[i]->virt_code, UP);
+            send_key_input(keys[i], UP);
     }
 }
 
@@ -189,8 +202,9 @@ static int parse_chord(char *value, KEY_DEF **out)
     char *p = value;
     while (*p) {
         while (isspace((unsigned char)*p)) ++p;
-        char *start = p;
+        if (*p == '\0') break;
 
+        char *start = p;
         while (*p && *p != '+') ++p;
 
         char saved = *p;

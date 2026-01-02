@@ -27,9 +27,9 @@ KEY(RIGHT              ,0xE04D     ,0x27      )
 KEY(DOWN               ,0xE050     ,0x28      )
 
 KEY(LBRACKET           ,0x1A       ,0xDB      )
-KEY(LBRACE             ,0x1A       ,0xDB      )
+SKEY(LBRACE            ,0x1A       ,0xDB      )
 KEY(RBRACKET           ,0x1B       ,0xDD      )
-KEY(RBRACE             ,0x1B       ,0xDD      )
+SKEY(RBRACE            ,0x1B       ,0xDD      )
 KEY(BACKSLASH          ,0x2B       ,0xDC      )
 KEY(APOSTROPHE         ,0x28       ,0xDE      )
 
