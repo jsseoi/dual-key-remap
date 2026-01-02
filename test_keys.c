@@ -593,6 +593,16 @@ EXPECT(rbracket_key != NULL, "RBRACKET key should be found");
 EXPECT(rbracket_key->scan_code == 0x1B, "RBRACKET scan code should be 0x1B");
 EXPECT(rbracket_key->virt_code == 0xDD, "RBRACKET virt code should be 0xDD");
 
+KEY_DEF *lbrace_key = find_key_def_by_name("LBRACE");
+EXPECT(lbrace_key != NULL, "LBRACE key should be found");
+EXPECT(lbrace_key->scan_code == 0x1A, "LBRACE scan code should be 0x1A");
+EXPECT(lbrace_key->virt_code == 0xDB, "LBRACE virt code should be 0xDB");
+
+KEY_DEF *rbrace_key = find_key_def_by_name("RBRACE");
+EXPECT(rbrace_key != NULL, "RBRACE key should be found");
+EXPECT(rbrace_key->scan_code == 0x1B, "RBRACE scan code should be 0x1B");
+EXPECT(rbrace_key->virt_code == 0xDD, "RBRACE virt code should be 0xDD");
+
 KEY_DEF *backslash_key = find_key_def_by_name("BACKSLASH");
 EXPECT(backslash_key != NULL, "BACKSLASH key should be found");
 EXPECT(backslash_key->scan_code == 0x2B, "BACKSLASH scan code should be 0x2B");
