@@ -335,6 +335,24 @@ int main(void)
     SEE(LSHIFT, UP);
     EMPTY();
 
+    SECTION("Shifted key output (RBRACE)");
+    reset_config();
+    KEY_DEF * rbrace_def = find_key_def_by_name("RBRACE");
+    KEY_DEF * tab_def = find_key_def_by_name("TAB");
+    KEY_DEF * rbracket_def = find_key_def_by_name("RBRACKET");
+
+    struct Remap * r_shifted_r = new_remap(tab_def, rbrace_def, rbrace_def);
+    register_remap(r_shifted_r);
+
+    IN(TAB, DOWN); EMPTY();
+    IN(TAB, UP);
+    // Should see: Shift Down, RBracket Down, RBracket Up, Shift Up
+    SEE(LSHIFT, DOWN);
+    SEE(rbracket_def, DOWN);
+    SEE(rbracket_def, UP);
+    SEE(LSHIFT, UP);
+    EMPTY();
+
     g_debug = 0;
 
     #include "test_keys.c"
