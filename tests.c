@@ -324,12 +324,11 @@ int main(void)
 
     SECTION("Shifted key output (LBRACE)");
     reset_config();
-    KEY_DEF * lbrace_def = find_key_def_by_name("LBRACE");
-    KEY_DEF * caps_def = find_key_def_by_name("CAPSLOCK");
     KEY_DEF * lbracket_def = find_key_def_by_name("LBRACKET");
 
-    struct Remap * r_shifted = new_remap(caps_def, lbrace_def, lbrace_def);
-    register_remap(r_shifted);
+    EXPECT(load_config_line("remap_key=CAPSLOCK",0)==0,"");
+    EXPECT(load_config_line("when_alone=LBRACE",0)==0,"");
+    EXPECT(load_config_line("with_other=LBRACE",0)==0,"");
 
     IN(CAPS, DOWN); EMPTY();
     IN(CAPS, UP);
@@ -342,12 +341,11 @@ int main(void)
 
     SECTION("Shifted key output (RBRACE)");
     reset_config();
-    KEY_DEF * rbrace_def = find_key_def_by_name("RBRACE");
-    KEY_DEF * tab_def = find_key_def_by_name("TAB");
     KEY_DEF * rbracket_def = find_key_def_by_name("RBRACKET");
 
-    struct Remap * r_shifted_r = new_remap(tab_def, rbrace_def, rbrace_def);
-    register_remap(r_shifted_r);
+    EXPECT(load_config_line("remap_key=TAB",0)==0,"");
+    EXPECT(load_config_line("when_alone=RBRACE",0)==0,"");
+    EXPECT(load_config_line("with_other=RBRACE",0)==0,"");
 
     IN(TAB, DOWN); EMPTY();
     IN(TAB, UP);
