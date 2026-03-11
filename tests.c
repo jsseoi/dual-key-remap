@@ -320,10 +320,42 @@ int main(void)
     free(log1);
 
     g_debug = 0;
+    clear_out();
+
+    SECTION("Shifted key output (LBRACE)");
+    reset_config();
+    KEY_DEF * lbracket_def = find_key_def_by_name("LBRACKET");
+
+    EXPECT(load_config_line("remap_key=CAPSLOCK",0)==0,"");
+    EXPECT(load_config_line("when_alone=LBRACE",0)==0,"");
+    EXPECT(load_config_line("with_other=LBRACE",0)==0,"");
+
+    IN(CAPS, DOWN); EMPTY();
+    IN(CAPS, UP);
+    SEE(LSHIFT, DOWN);
+    SEE(lbracket_def, DOWN);
+    SEE(lbracket_def, UP);
+    SEE(LSHIFT, UP);
+    EMPTY();
+
+    SECTION("Shifted key output (RBRACE)");
+    reset_config();
+    KEY_DEF * rbracket_def = find_key_def_by_name("RBRACKET");
+
+    EXPECT(load_config_line("remap_key=TAB",0)==0,"");
+    EXPECT(load_config_line("when_alone=RBRACE",0)==0,"");
+    EXPECT(load_config_line("with_other=RBRACE",0)==0,"");
+
+    IN(TAB, DOWN); EMPTY();
+    IN(TAB, UP);
+    SEE(LSHIFT, DOWN);
+    SEE(rbracket_def, DOWN);
+    SEE(rbracket_def, UP);
+    SEE(LSHIFT, UP);
+    EMPTY();
 
     // Debug section generates real outputs but doesn't consume them with SEE()
     // Drain the output queue so subsequent sections start clean
-    clear_out();
 
     SECTION("with_other: multiple keys down in order, up in reverse");
     reset_config();

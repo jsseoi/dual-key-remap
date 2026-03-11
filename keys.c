@@ -8,23 +8,28 @@ struct KeyDef {
     char * name;
     int scan_code;
     int virt_code;
+    int flags;
 };
 typedef struct KeyDef KEY_DEF;
 
 // Generate enum from keys.def
 #define KEY(n,s,v) k_##n,
+#define SKEY(n,s,v) k_##n,
 enum {
 #include "keys.def"
     k_COUNT
 };
 #undef KEY
+#undef SKEY
 
 // Generate key table from keys.def
-#define KEY(n,s,v) { #n, s, v },
+#define KEY(n,s,v) { #n, s, v, 0 },
+#define SKEY(n,s,v) { #n, s, v, 1 },
 KEY_DEF key_table[] = {
 #include "keys.def"
 };
 #undef KEY
+#undef SKEY
 
 #define KEY_TABLE_LEN (sizeof(key_table) / sizeof(struct KeyDef))
 
@@ -47,7 +52,7 @@ KEY_DEF * ESC   = &key_table[k_ESCAPE];
 KEY_DEF * SPACE = &key_table[k_SPACE];
 KEY_DEF * TAB   = &key_table[k_TAB];
 KEY_DEF * NOOP  = &key_table[k_NOOP];
-KEY_DEF * MOUSE = &(struct KeyDef){"<MOUSE>", 0, MOUSE_DUMMY_VK};
+KEY_DEF * MOUSE = &(struct KeyDef){"<MOUSE>", 0, MOUSE_DUMMY_VK, 0};
 
 KEY_DEF * find_key_def_by_name(char * name)
 {
