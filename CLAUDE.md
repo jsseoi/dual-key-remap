@@ -24,7 +24,7 @@ Pragmatic C in the style of Linus + DHH. Minimal abstractions, clean data struct
 
 ### Version number
 
-Set in `dual-key-remap.c` line 1: `#define VERSION "0.10"`. The release script reads this.
+Set in `dual-key-remap.c` line 1: `#define VERSION "0.11"`. The release script reads this.
 
 ### Steps
 

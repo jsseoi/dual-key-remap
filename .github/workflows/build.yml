@@ -1,0 +1,167 @@
+name: Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Run tests
+        shell: cmd
+        run: cl tests.c && tests.exe
+
+  build:
+    needs: test
+    runs-on: windows-latest
+    outputs:
+      version: ${{ steps.version.outputs.value }}
+      zip_name: ${{ steps.package.outputs.zip_name }}
+      setup_name: ${{ steps.installer.outputs.setup_name }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ilammy/msvc-dev-cmd@v1
+
+      - id: version
+        name: Read version
+        shell: pwsh
+        run: |
+          $line = Get-Content -Path .\dual-key-remap.c | Select-Object -First 1
+          if ($line -notmatch '"([^"]+)"') {
+            throw "Failed to parse VERSION from dual-key-remap.c"
+          }
+          "value=$($Matches[1])" >> $env:GITHUB_OUTPUT
+
+      - name: Build executable
+        shell: cmd
+        run: rc resources.rc && cl .\dual-key-remap.c resources.res /Fe:dual-key-remap.exe /link user32.lib shell32.lib /SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup
+
+      - id: package
+        name: Package portable release
+        shell: pwsh
+        run: |
+          ./release.ps1 -NoOpenExplorer
+          "zip_name=dual-key-remap-v${{ steps.version.outputs.value }}.zip" >> $env:GITHUB_OUTPUT
+
+      - name: Install Inno Setup
+        shell: pwsh
+        run: choco install innosetup --no-progress -y
+
+      - id: installer
+        name: Build installer
+        shell: pwsh
+        run: |
+          $setupName = "dual-key-remap-setup-v${{ steps.version.outputs.value }}"
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" `
+            "/DAppVersion=${{ steps.version.outputs.value }}" `
+            "/DOutputBaseFilename=$setupName" `
+            .\installer.iss
+          "setup_name=$setupName.exe" >> $env:GITHUB_OUTPUT
+
+      - name: Upload executable artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dual-key-remap-exe
+          path: dual-key-remap.exe
+
+      - name: Upload portable artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dual-key-remap-portable
+          path: releases/${{ steps.package.outputs.zip_name }}
+
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dual-key-remap-installer
+          path: releases/${{ steps.installer.outputs.setup_name }}
+
+  continuous-release:
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download portable artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dual-key-remap-portable
+          path: artifacts/portable
+
+      - name: Download installer artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dual-key-remap-installer
+          path: artifacts/installer
+
+      - name: Download executable artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dual-key-remap-exe
+          path: artifacts/exe
+
+      - name: Publish continuous prerelease
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: continuous
+          target_commitish: ${{ github.sha }}
+          name: Continuous build
+          prerelease: true
+          make_latest: false
+          body: |
+            Automated build from `${{ github.sha }}`.
+            Version: `${{ needs.build.outputs.version }}`
+          files: |
+            artifacts/portable/${{ needs.build.outputs.zip_name }}
+            artifacts/installer/${{ needs.build.outputs.setup_name }}
+            artifacts/exe/dual-key-remap.exe
+          fail_on_unmatched_files: true
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download portable artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dual-key-remap-portable
+          path: artifacts/portable
+
+      - name: Download installer artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dual-key-remap-installer
+          path: artifacts/installer
+
+      - name: Download executable artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dual-key-remap-exe
+          path: artifacts/exe
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            artifacts/portable/${{ needs.build.outputs.zip_name }}
+            artifacts/installer/${{ needs.build.outputs.setup_name }}
+            artifacts/exe/dual-key-remap.exe
+          fail_on_unmatched_files: true
+          generate_release_notes: true

@@ -4,9 +4,6 @@
 
 Remap any key to any other two keys on Windows. Most commonly used to remap CapsLock to Escape when pressed alone and Ctrl when pressed with other keys. Written in C to run at the lowest Windows API level for speed and reliability 🔥.
 
-> [!NOTE]
-> Thoughts on future of dual-key-remap and the path towards v1: https://github.com/ililim/dual-key-remap/discussions/74
-
 ## Features
 
 - Fast with minimal cpu footprint
@@ -19,10 +16,11 @@ Other solutions can leak inputs, get stuck, or do not handle key timing edge cas
 
 ## Installation
 
-1. Download and unzip the latest [release](https://github.com/ililim/dual-key-remap/releases).
-2. Put both 'dual-key-remap.exe' and 'config.txt' in a permanent directory of your choice. (e.g. `C:\Program Files\dual-key-remap`).
-3. Download [`add-to-startup.bat`](https://github.com/ililim/dual-key-remap/blob/main/add-to-startup.bat) into the same folder and run it as Administrator to start dual-key-remap automatically at login.
-4. Optionally edit config.txt (see below) and run 'dual-key-remap.exe'. 🥳 Your chosen keys are now remapped!
+1. Download the latest installer (`dual-key-remap-setup-v*.exe`) from [Releases](https://github.com/jsseoi/dual-key-remap/releases) and run it.
+2. After setup completes, edit `config.txt` in the install folder if you want to customize bindings.
+3. Launch Dual Key Remap from the Start Menu or the installed shortcut. 🥳 Your chosen keys are now remapped!
+
+If you prefer a portable install instead, download the ZIP release, put both `dual-key-remap.exe` and `config.txt` in a permanent directory of your choice (for example `C:\Program Files\dual-key-remap`), then run [`add-to-startup.bat`](./add-to-startup.bat) there as Administrator.
 
 To uninstall, right-click the tray icon and select "Exit", then remove the scheduled task by running: `schtasks /delete /tn "DualKeyRemap" /f`
 
@@ -104,7 +102,7 @@ Mouse clicks and scrolling will trigger the "with_other" behavior when a dual ke
 
 ### Administrator access
 
-If launched normally Dual Key Remap will not be able to rebind your key inputs while you're viewing escalated/administrator applications (e.g. Task Manager). The [`add-to-startup.bat`](https://github.com/ililim/dual-key-remap/blob/main/add-to-startup.bat) script handles this by creating a scheduled task that runs with admin privileges. If you're launching manually, make sure to run Dual Key Remap as administrator.
+If launched normally Dual Key Remap will not be able to rebind your key inputs while you're viewing escalated/administrator applications (e.g. Task Manager). The [`add-to-startup.bat`](./add-to-startup.bat) script handles this by creating a scheduled task that runs with admin privileges. If you're launching manually, make sure to run Dual Key Remap as administrator.
 
 ### Debug Mode
 

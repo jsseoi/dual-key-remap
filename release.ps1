@@ -1,3 +1,8 @@
+[CmdletBinding()]
+param(
+    [switch]$NoOpenExplorer
+)
+
 $VerLine = Get-Content -Path "dual-key-remap.c" | Select-Object -First 1
 $Version = ($VerLine | Select-String -Pattern '"(.+)"').Matches.Groups[1].Value
 Write-Output "Releasing version $Version..."
@@ -20,4 +25,6 @@ if (Test-Path -Path $Zip) { Remove-Item $Zip }
 Compress-Archive -Path "$Folder\*" -DestinationPath $Zip
 Write-Output "Created $Zip"
 
-explorer releases
+if (-not $NoOpenExplorer) {
+    explorer releases
+}
